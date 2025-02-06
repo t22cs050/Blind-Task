@@ -5,8 +5,10 @@
 !Assets
 !Scenes
 !Script
-!Script/*
-!Assets/Scenes/Script/*.cs
+!MiniGames
+!offline
+!online
+!*.cs
 
 # .gitignoreファイル自体も無視しない
 !.gitignore
