@@ -2,6 +2,10 @@
 *
 
 # ただし、Assets/Scenes/Script内の.csファイルは無視しない
+!Assets
+!Scenes
+!Script
+!Script/*
 !Assets/Scenes/Script/*.cs
 
 # .gitignoreファイル自体も無視しない
