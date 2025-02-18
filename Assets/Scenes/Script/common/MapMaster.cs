@@ -37,6 +37,12 @@ public class MapMaster : MonoBehaviour
     setMap();//マップをゲーム画面に作成
   }
 
+  public void create(IMain m, int _seed, int w, int h){
+    mapWidth = w;
+    mapHeight = h;
+    create(m,seed);
+  }
+
   private void clearChild(){
     //子オブジェクト（壁など）が既にあれば削除
     foreach ( Transform n in gameObject.transform ){
