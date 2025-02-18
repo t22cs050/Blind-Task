@@ -8,6 +8,8 @@
 !MiniGames
 !offline
 !online
+!common
+!Menu
 !*.cs
 
 # .gitignoreファイル自体も無視しない
