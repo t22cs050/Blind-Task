@@ -1,4 +1,3 @@
-using System;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -48,6 +47,14 @@ public class onlineController : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer) {
         Debug.Log("プレイヤーが退出");
         // 必要な処理をここに追加
+        main.LeftRoom();
+    }
+
+    // 自分がルームから退出した時に呼ばれるコールバック
+    public override void OnLeftRoom() {
+        Debug.Log("自分が退出");
+        // 必要な処理をここに追加
+        main.LeftRoom();
     }
 
     //PUNのコールバック定義終了

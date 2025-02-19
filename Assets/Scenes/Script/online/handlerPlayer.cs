@@ -97,7 +97,7 @@ public class handlerPlayer : IHandler
         if(cam.GameOverAngle(enemy)){
             main.LeaveRoom();
             //ゲームオーバー後の遷移処理
-            SceneManager.LoadScene("MainMenu");
+            SceneManager.LoadScene("Result");
         }
     }
 
@@ -117,7 +117,7 @@ public class handlerPlayer : IHandler
         main.LeaveRoom();
         
         // ゲームクリア後の遷移処理
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("Result");
     }
 
     private void serchMine(){//設置されたセンサーを探索

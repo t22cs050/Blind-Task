@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; //UIを制御する為追加
 using System; //DateTimeを使用する為追加
-using UnityEngine.SceneManagement; //シーン遷移をする為追加
 using UnityEngine.Rendering.PostProcessing;
-using ExitGames.Client.Photon.StructWrapping; //画面の周りを赤くする為追加
+using System.Collections; //画面の周りを赤くする為追加
 
 public class onlineMain : MonoBehaviour,IMain
 {
@@ -52,6 +51,8 @@ public class onlineMain : MonoBehaviour,IMain
 
   //位置を知らせるUIの表示時間
   private const int vTimer = 15;
+  private float gameStartTime;
+  [SerializeField]private GameObject otherLeftMessage;
 
     void Start()
   {
@@ -110,6 +111,8 @@ public class onlineMain : MonoBehaviour,IMain
 
     Text text = RemainTaskQuantityUI.GetComponent<Text> ();
     text.text = "残りタスク:" + mapSc.getTaskQuantity();
+    
+    gameStartTime = Time.time;
   }
   public void Update(){
     //各初期設定が終わるまでは処理しない
@@ -280,6 +283,8 @@ public class onlineMain : MonoBehaviour,IMain
       isGameClear = true;
       //クリアしたタスクの位置を敵に知らせる
       online.sendTaskClear(taskPos);
+      //リザルトシーンにデータを格納
+      GameEnd(true);
       return;
     }
     lightRedBlinkOn();//ライトの赤点滅を開始
@@ -325,7 +330,15 @@ public class onlineMain : MonoBehaviour,IMain
       runningTask.destroyMiniGame();
       runningTask = null;
     }
+    GameEnd(false);
   }
+
+  private void GameEnd(bool isPlayerWon){
+    Result r = new Result();
+    r.setTime(Time.time - gameStartTime);
+    r.setIsPlayerWon(isPlayerWon);
+  }
+
   public bool getGameOver(){
     return isGameOver;
   }
@@ -363,6 +376,7 @@ public class onlineMain : MonoBehaviour,IMain
     clearedTaskQuantity++;
     if(clearedTaskQuantity == mapSc.getTaskQuantity()){
       isGameClear = true;
+      GameEnd(true);
       return;
     }
     lightRedBlinkOn();//ライトの赤点滅を開始
@@ -450,4 +464,15 @@ public class onlineMain : MonoBehaviour,IMain
     mainCamSc.showAll();
   }
 
+  public void LeftRoom(){
+    if(isGameClear || isGameClear)
+      return;
+    otherLeftMessage.SetActive(true);
+    StartCoroutine(WaitAndChangeScene());
+  }
+
+  private IEnumerator WaitAndChangeScene(){
+    yield return new WaitForSeconds(3);
+    UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+  }
 }

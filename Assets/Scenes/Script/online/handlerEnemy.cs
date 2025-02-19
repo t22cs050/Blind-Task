@@ -73,7 +73,7 @@ public class handlerEnemy : IHandler
         if(cam.GameOverAngle(player)){
             main.LeaveRoom();
             //ゲームオーバー後の遷移処理
-            SceneManager.LoadScene("MainMenu");
+            SceneManager.LoadScene("Result");
         }
     }
 
@@ -82,7 +82,7 @@ public class handlerEnemy : IHandler
         //プレイヤー側にゲームクリアされたら退出
         main.LeaveRoom();
         //ゲームオーバー後の遷移処理
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("Result");
     }
 
     public void hideOther()
