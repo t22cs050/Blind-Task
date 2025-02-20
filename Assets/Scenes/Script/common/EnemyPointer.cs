@@ -16,10 +16,12 @@ public class EnemyPointer : MonoBehaviour
         rootRectTransform = this.transform.parent.GetChild(0).GetComponent<RectTransform>();
         thisRectTransform = this.GetComponent<RectTransform>();
         Rect thisRect = thisRectTransform.rect;
+
         xMin = rootRectTransform.rect.xMin+(thisRect.width/2);
         xMax = rootRectTransform.rect.xMax-(thisRect.width/2);
         yMin = rootRectTransform.rect.yMin+(thisRect.height/2);
         yMax = rootRectTransform.rect.yMax-(thisRect.height/2);
+        
         Debug.Log(rootRectTransform.gameObject.name);
         Update();
     }  
@@ -32,24 +34,34 @@ public class EnemyPointer : MonoBehaviour
 
     void Update()
     {
+        // 敵の画面上の位置を取得
         Vector3 enemyPos = maincamera.WorldToScreenPoint(Enemy.transform.position);
 
+        // 敵の位置をRectTransform座標に変換
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             rootRectTransform,
             enemyPos,
             null,
             out Vector2 localPoint);
 
+        // 位置を敵の少し上になるように調整
         localPoint.y += 50f;
+
+        // ポインターが画面外いるかどうかをチェック
         if(isScreenOut(localPoint)){
+            // 画面外の場合、位置を画面内に収める
             Vector2 newLocalPoint = insideScreen(localPoint);
+            // ポインターを敵の方向に回転させる
             thisRectTransform.rotation = Quaternion.Euler(0, 0, getAngleTowardTarget(newLocalPoint, localPoint));
+            // 画面内に収めた位置に更新
             localPoint = newLocalPoint;
         }
         else{
+            // ローカルポイントが画面内の場合、回転をリセット
             thisRectTransform.rotation = Quaternion.Euler(0, 0, 0);
         }    
 
+        // ポインターの位置を更新
         thisRectTransform.anchoredPosition = localPoint;
     }
 
