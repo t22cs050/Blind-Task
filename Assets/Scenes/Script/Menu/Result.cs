@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -103,5 +104,9 @@ public class Result : MonoBehaviour
     }
     public void setIsPlayerWon(bool b){
         isPlayerWon = b;
+    }
+
+    public void setIsOnline(bool v){
+        isOnline = v;
     }
 }

@@ -3,7 +3,8 @@ using UnityEngine;
 using UnityEngine.UI; //UIを制御する為追加
 using System; //DateTimeを使用する為追加
 using UnityEngine.Rendering.PostProcessing;
-using System.Collections; //画面の周りを赤くする為追加
+using System.Collections;
+using UnityEngine.SceneManagement; //画面の周りを赤くする為追加
 
 public class onlineMain : MonoBehaviour,IMain
 {
@@ -52,13 +53,25 @@ public class onlineMain : MonoBehaviour,IMain
   //位置を知らせるUIの表示時間
   private const int vTimer = 15;
   private float gameStartTime;
-  [SerializeField]private GameObject otherLeftMessage;
+
+  //通信が切断された時に表示するメッセージ
+  [SerializeField]private GameObject LeftRoomMessage;
+
+  //マッチング中に表示するUI
+  [SerializeField] private GameObject matchingUI;
 
     void Start()
   {
     isGameStart = false;
     isGameOver = false;
     isGameClear = false;
+    //オブジェクトの生成とクラスの取得
+    InitObjects();
+    ShowMatchingText();
+  }
+
+  // オブジェクトの生成とクラスの取得
+  private void InitObjects(){
     //オブジェクトを生成
     mapObj = Instantiate(mapObj, this.transform);
     playerObj = Instantiate(playerObj, this.transform);
@@ -77,14 +90,17 @@ public class onlineMain : MonoBehaviour,IMain
   * そうでなければシード値をマスタークライアントから受信する
   */
   public void setMap(){
+    //マスタークライアントでなければ処理しない
     if(!online.isMaster())
       return;
+
     //シード値として現在時刻のミリ秒を指定
     int seed = DateTime.Now.Millisecond;
     //シード値を送信
     online.sendSeed(seed);
     //シード値をもとにマップを生成
     mapSc.create(this, seed);
+
     //その他のオブジェクトも各初期設定をする
     objectsSetting();
   }
@@ -93,7 +109,13 @@ public class onlineMain : MonoBehaviour,IMain
     mapSc.create(this, seed);
     //その他のオブジェクトも各初期設定をする
     objectsSetting();
-  }
+    }
+    public void HideMatchingText() {
+      matchingUI.SetActive(false);
+    }
+    private void ShowMatchingText() {
+        matchingUI.SetActive(true);
+    }
 
   //各オブジェクトのクラスを初期化
   private void objectsSetting(){//各オブジェクトの初期設定を行う
@@ -109,6 +131,9 @@ public class onlineMain : MonoBehaviour,IMain
       handler = new handlerEnemy();
     handler.objectsSetting(this);
 
+    //マッチング中のUIを非表示にする
+    HideMatchingText();
+
     Text text = RemainTaskQuantityUI.GetComponent<Text> ();
     text.text = "残りタスク:" + mapSc.getTaskQuantity();
     
@@ -116,8 +141,14 @@ public class onlineMain : MonoBehaviour,IMain
   }
   public void Update(){
     //各初期設定が終わるまでは処理しない
-    if(!isGameStart)
+    if(!isGameStart){
+      // Escキーでメインメニューに遷移
+      if (Input.GetKeyDown(KeyCode.Escape))
+      {
+          SceneManager.LoadScene("MainMenu");
+      }
       return;
+    }
     //操作キャラクターの動きを停止
     handler.stopMove();
 
@@ -337,6 +368,7 @@ public class onlineMain : MonoBehaviour,IMain
     Result r = new Result();
     r.setTime(Time.time - gameStartTime);
     r.setIsPlayerWon(isPlayerWon);
+    r.setIsOnline(true);
   }
 
   public bool getGameOver(){
@@ -467,12 +499,12 @@ public class onlineMain : MonoBehaviour,IMain
   public void LeftRoom(){
     if(isGameClear || isGameClear)
       return;
-    otherLeftMessage.SetActive(true);
+    LeftRoomMessage.SetActive(true);
     StartCoroutine(WaitAndChangeScene());
   }
 
   private IEnumerator WaitAndChangeScene(){
     yield return new WaitForSeconds(3);
-    UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+    SceneManager.LoadScene("MainMenu");
   }
 }

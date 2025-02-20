@@ -39,6 +39,8 @@ public class offlineMain : MonoBehaviour, IMain
   private bool isGameOver = false;
   private bool isGameClear = false;
   private int clearedTaskQuantity;
+
+  private float gameStartTime;
   // Start is called before the first frame update
   void Start()
   {
@@ -55,6 +57,7 @@ public class offlineMain : MonoBehaviour, IMain
     mainCamSc = mainCam.GetComponent<CameraControl>();
     //各オブジェクトのクラスを初期化
     objectsSetting();
+    gameStartTime = Time.time;
   }
 
   private void objectsSetting(){//各オブジェクトの初期設定を行う
@@ -129,6 +132,8 @@ public class offlineMain : MonoBehaviour, IMain
     clearedTaskQuantity++;
     if(clearedTaskQuantity == mapSc.getTaskQuantity()){
       isGameClear = true;
+      GameEnd(true);
+      SceneManager.LoadScene("Result");
       return;
     }
     lightRedBlinkOn();//ライトの赤点滅を開始
@@ -157,8 +162,17 @@ public class offlineMain : MonoBehaviour, IMain
       runningTask.destroyMiniGame();
       runningTask = null;
     }
+    GameEnd(false);
   }
-  public bool getGameOver(){
+
+  private void GameEnd(bool isPlayerWon){
+    Result r = new Result();
+    r.setTime(Time.time - gameStartTime);
+    r.setIsPlayerWon(isPlayerWon);
+    r.setIsOnline(false);
+  }
+
+    public bool getGameOver(){
     return isGameOver;
   }
 
@@ -263,15 +277,10 @@ public class offlineMain : MonoBehaviour, IMain
     serchMine();
     if(isGameOver){
       if(mainCamSc.GameOverAngle(enemyObj)){
-        isGameOver = false;
-        enemyHide();
-        objectsSetting();
+        SceneManager.LoadScene("Result");
       }
     }
-    else if(isGameClear){
-      SceneManager.LoadScene("OffLineClear");
-    }
-    else{
+    else if(!isGameClear){
       mainCamSc.move();
       //プレイヤーと敵の距離からvignetteを調整
       setVignetteFromDistance();
