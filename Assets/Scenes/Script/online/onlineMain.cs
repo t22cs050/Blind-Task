@@ -135,7 +135,7 @@ public class onlineMain : MonoBehaviour,IMain
     HideMatchingText();
 
     Text text = RemainTaskQuantityUI.GetComponent<Text> ();
-    text.text = "残りタスク:" + mapSc.getTaskQuantity();
+    text.text = "残り" + Mathf.CeilToInt(GetGameProgress()) + "でゲーム終了";
     
     gameStartTime = Time.time;
   }
@@ -310,7 +310,7 @@ public class onlineMain : MonoBehaviour,IMain
     runningTask = null;
     // eneSc.setPath(taskPos);
     clearedTaskQuantity++;
-    if(clearedTaskQuantity == mapSc.getTaskQuantity()){
+    if(GetGameProgress() <= 0f){
       isGameClear = true;
       //クリアしたタスクの位置を敵に知らせる
       online.sendTaskClear(taskPos);
@@ -320,10 +320,16 @@ public class onlineMain : MonoBehaviour,IMain
     }
     lightRedBlinkOn();//ライトの赤点滅を開始
     Text text = RemainTaskQuantityUI.GetComponent<Text> ();
-    text.text = "残りタスク:" + (mapSc.getTaskQuantity()-clearedTaskQuantity);
+    text.text = "残り" + Mathf.CeilToInt(GetGameProgress()) + "でゲーム終了";
 
     //クリアしたタスクの位置を敵に知らせる
     online.sendTaskClear(taskPos);
+  }
+
+  //ゲームクリアまでの進捗を返す関数
+  public float GetGameProgress() {
+    //タスクの65%以上をクリアしていたらクリア
+    return ((float)mapSc.getTaskQuantity() * 0.65f) - (float)clearedTaskQuantity;
   }
   
   public void lightRedBlinkOn(){//ライトの赤点滅を開始
@@ -406,7 +412,7 @@ public class onlineMain : MonoBehaviour,IMain
       return;
 
     clearedTaskQuantity++;
-    if(clearedTaskQuantity == mapSc.getTaskQuantity()){
+    if(GetGameProgress() <= 0f){
       isGameClear = true;
       GameEnd(true);
       return;
@@ -415,7 +421,7 @@ public class onlineMain : MonoBehaviour,IMain
     //クリアしたタスクの位置を敵に知らせる
     InitializeEnemyPointer(mapSc.convertRealPosition(taskPos.x, taskPos.y));
     Text text = RemainTaskQuantityUI.GetComponent<Text> ();
-    text.text = "残りタスク:" + (mapSc.getTaskQuantity()-clearedTaskQuantity);
+    text.text = "残り" + Mathf.CeilToInt(GetGameProgress()) + "でゲーム終了";
   }
 
   public void InitializeEnemyPointer(Vector3 target){
